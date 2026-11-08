@@ -6,7 +6,7 @@ export interface AppConfig {
   readonly port: number;
   readonly databaseUrl: string;
   readonly corsOrigins: readonly string[];
-  readonly authMode: 'dev';
+  readonly authMode: 'dev' | 'disabled';
   readonly logLevel: 'debug' | 'info' | 'warn' | 'error';
 }
 
@@ -19,7 +19,9 @@ const envSchema = z
       .string()
       .regex(/^postgres(ql)?:\/\/.+/, 'DATABASE_URL must be a postgres:// connection string.'),
     CORS_ORIGINS: z.string().default('http://localhost:3000'),
-    AUTH_MODE: z.enum(['dev']).default('dev'),
+    // "dev" trusts a development header and is refused in production. "disabled" signs no one
+    // in: public routes work and staff routes answer 401 until an identity provider exists.
+    AUTH_MODE: z.enum(['dev', 'disabled']).default('dev'),
     LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   })
   .superRefine((env, context) => {
@@ -30,7 +32,7 @@ const envSchema = z
         code: 'custom',
         path: ['AUTH_MODE'],
         message:
-          'Development authentication cannot run in production. Configure the identity provider first.',
+          'Development authentication cannot run in production. Use AUTH_MODE=disabled until the identity provider is configured.',
       });
     }
   });

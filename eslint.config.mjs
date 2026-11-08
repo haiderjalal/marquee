@@ -11,6 +11,7 @@ export default tseslint.config(
       '**/.next/**',
       '**/dist/**',
       '**/coverage/**',
+      '**/.vercel/**',
       '**/next-env.d.ts',
     ],
   },
@@ -47,7 +48,8 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/*.config.{js,mjs,ts}', 'eslint.config.mjs'],
+    // Plain Node scripts that run without a TypeScript project (for example build tooling).
+    files: ['**/*.config.{js,mjs,ts}', 'eslint.config.mjs', '**/scripts/*.mjs'],
     extends: [tseslint.configs.disableTypeChecked],
   },
 );
