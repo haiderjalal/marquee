@@ -1,0 +1,22 @@
+# Dependencies and build output
+node_modules/
+.next/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Local environment: never commit real values
+.env
+.env.*
+!.env.example
+
+# Local database data and logs
+.pgdata/
+*.log
+
+# Editor and OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
