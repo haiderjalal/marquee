@@ -60,9 +60,11 @@ route that forwards enquiry status changes with the dev identity. That route ret
 | Enquiry submission in the browser    | Success state shows reference ENQ-XEKM26XH                                                                                                                                           |
 | Staff overview in the browser        | Upcoming events 1, new enquiries 6, "Not yet available" for payments and billing                                                                                                     |
 
-Not verified: visual side-by-side comparison of every screen, Lighthouse, axe, WebGL-loss behaviour,
-and load time. The first load of the planner routes took several seconds in the browser pane, which is
-not a measured result.
+Visual comparison against the six screenshots: done for every screen, by eye, not by pixel diff. Remaining differences are deliberate or pending: the planner opens in 2D rather than the reference's 3D view; photographs are labelled placeholders; the public estimate applies no staff concession, so it shows PKR 735,000 where the reference shows PKR 725,000; the overview greeting has no user name and there is no checklist. Not verified: Lighthouse, axe, WebGL-loss behaviour and measured load time.
+
+Stage fit is now checked by the server (`checkStagePreset`): a preset that collides with seated tables or leaves the floor is reported with the affected table IDs, the stage step holds its Continue button, and a quote for it is refused. The demonstration catalogue includes a Grand Stage that deliberately collides at 200 and 500 guests.
+
+Fixed on this pass: direct loads of the planner stalled on its route-level loading boundary (a nested `main` element), which was removed in favour of an in-page status message.
 
 ### Defects found in this round and fixed
 
@@ -79,8 +81,6 @@ not a measured result.
 
 Found in the web review and not yet implemented:
 
-- **Stage in layout validation.** `configurations/validate` ignores the chosen stage, so a stage that
-  conflicts with the seating is not detected (LAY07).
 - **Quotation download.** No PDF is generated; the button is absent from the review step.
 - **Staff overview detail.** No per-space guest counts, no event-level rows, and no user name in the
   greeting. The API does not provide them yet.
