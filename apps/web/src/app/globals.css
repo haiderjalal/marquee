@@ -1,0 +1,100 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. This is the only place colours are defined; components use the
+ * generated utilities (bg-cream, text-ink, border-line ...) and never raw values.
+ * Text-bearing terracotta uses the "accent" token, which passes WCAG AA on cream
+ * and with white text. The lighter "terracotta" token is for borders and fills.
+ */
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, 'Times New Roman', serif;
+}
+
+@theme {
+  --color-cream: #f7f2ea;
+  --color-cream-deep: #efe7da;
+  --color-surface: #fcfaf6;
+  --color-line: #e0d5c5;
+  --color-ink: #2a2230;
+  --color-ink-muted: #5e5566;
+  --color-plum: #2a2230;
+  --color-plum-hover: #3d3345;
+  --color-plum-deep: #231c2a;
+  --color-plum-line: #3a3042;
+  --color-on-plum: #f7f2ea;
+  --color-on-plum-muted: #c9bfd0;
+  --color-terracotta: #b5694a;
+  --color-accent: #a15a3d;
+  --color-accent-hover: #8c4c32;
+  --color-terracotta-soft: #f3e1d6;
+  --color-sage: #a9c3a0;
+  --color-sage-soft: #e4ede0;
+  --color-sage-ink: #3f6b3a;
+  --color-amber: #e8c9a0;
+  --color-amber-ink: #7a5522;
+  --color-danger: #a33a3a;
+  --color-danger-soft: #f6e1de;
+  --color-plan-floor: #efe4d3;
+  --color-plan-aisle: #e2cbaa;
+  --color-plan-stage: #d9a58d;
+  --color-plan-entrance: #d8cdbd;
+  --color-plan-table: #fffdf9;
+  --color-plan-chair: #b99b73;
+
+  --shadow-card: 0 1px 2px rgb(42 34 48 / 0.05), 0 6px 20px rgb(42 34 48 / 0.05);
+  --container-page: 80rem;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+  }
+
+  .font-serif {
+    font-variant-numeric: lining-nums;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-variant-numeric: lining-nums;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  button:not(:disabled),
+  [role='button'],
+  summary {
+    cursor: pointer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
