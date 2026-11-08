@@ -1,0 +1,14 @@
+{
+  "name": "@marquee/domain",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pure business rules: money, intervals, seating counts, pricing, stock and enquiry validation.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}

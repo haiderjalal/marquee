@@ -1,0 +1,17 @@
+{
+  "name": "@marquee/spatial",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Canonical millimetre layout model, deterministic seating generation and spatial validation.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@marquee/domain": "0.1.0"
+  }
+}
