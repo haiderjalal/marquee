@@ -127,10 +127,10 @@ export function stageCheckFor(plan: SpacePlan, stage: CatalogueRecord): StageChe
  */
 export function stageConflictMessage(check: StageCheckDto): string {
   if (check.outsideFloor) {
-    return `The ${check.name} stage runs past the usable floor. Choose a smaller stage.`;
+    return `The ${check.name} runs past the usable floor. Choose a smaller stage.`;
   }
   const count = check.conflictingPlacementIds.length;
-  return `The ${check.name} stage would collide with ${count} table${count === 1 ? '' : 's'}. Move those tables or choose a smaller stage.`;
+  return `The ${check.name} would collide with ${count} table${count === 1 ? '' : 's'}. Choose a smaller stage or another guest count.`;
 }
 
 /**

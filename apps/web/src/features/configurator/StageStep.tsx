@@ -256,8 +256,8 @@ export function StageStep({ venue, validation }: StepProps): ReactNode {
           {stageConflict ? (
             <Notice tone="warning" className="mt-5">
               {stageConflict.outsideFloor
-                ? `The ${stageConflict.name} stage runs past the usable floor. Choose a smaller stage.`
-                : `The ${stageConflict.name} stage would collide with ${stageConflict.conflictingPlacementIds.length} table${stageConflict.conflictingPlacementIds.length === 1 ? '' : 's'}. Choose a smaller stage or another guest count.`}
+                ? `The ${stageConflict.name} runs past the usable floor. Choose a smaller stage.`
+                : `The ${stageConflict.name} would collide with ${stageConflict.conflictingPlacementIds.length} table${stageConflict.conflictingPlacementIds.length === 1 ? '' : 's'}. Choose a smaller stage or another guest count.`}
             </Notice>
           ) : (
             <Notice tone="info" className="mt-5">
