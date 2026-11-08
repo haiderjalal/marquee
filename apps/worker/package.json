@@ -1,0 +1,16 @@
+{
+  "name": "@marquee/worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Background worker: delivers committed outbox messages with leases, retries and dead-lettering.",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/main.ts",
+    "start": "tsx --env-file-if-exists=../../.env src/main.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@marquee/database": "0.1.0",
+    "@marquee/observability": "0.1.0",
+    "zod": "4.6.7"
+  }
+}

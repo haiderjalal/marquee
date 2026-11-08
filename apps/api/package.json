@@ -1,0 +1,26 @@
+{
+  "name": "@marquee/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NestJS domain API: transport, authorisation and module composition.",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/main.ts",
+    "start": "tsx --env-file-if-exists=../../.env src/main.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@marquee/contracts": "0.1.0",
+    "@marquee/database": "0.1.0",
+    "@marquee/domain": "0.1.0",
+    "@marquee/observability": "0.1.0",
+    "@marquee/spatial": "0.1.0",
+    "@nestjs/common": "12.4.0",
+    "@nestjs/core": "12.4.0",
+    "@nestjs/platform-express": "12.4.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "12.4.0"
+  }
+}
