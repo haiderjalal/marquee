@@ -1,7 +1,14 @@
 import { and, asc, eq, inArray } from 'drizzle-orm';
 
 import type { Database } from '../client';
-import { catalogueItems, shellVersions, spaces, venuePolicies, venues } from '../schema';
+import {
+  catalogueItems,
+  shellVersions,
+  spaces,
+  venuePhotos,
+  venuePolicies,
+  venues,
+} from '../schema';
 
 /**
  * Reads published venues and their approved configuration. Every query is scoped to
@@ -198,6 +205,67 @@ export async function findSpaceInTenant(
     .where(and(eq(spaces.tenantId, tenantId), eq(spaces.id, spaceId)))
     .limit(1);
   return row ? toSpaceRecord(row) : null;
+}
+
+/** Approved photograph shown for a venue. Pending and withdrawn photos never reach this type. */
+export interface VenuePhotoRecord {
+  readonly url: string;
+  readonly alt: string;
+}
+
+/** A venue reference that includes its tenant, so lookups stay inside one tenant. */
+export interface VenueRef {
+  readonly tenantId: string;
+  readonly venueId: string;
+}
+
+/**
+ * Loads the approved photo for each venue named. The query is limited to those tenants and
+ * venues, and results are keyed by tenant and venue so a photo can never attach to another tenant.
+ * @param db Database handle.
+ * @param refs Venues to look up.
+ * @returns Approved photos keyed by {@link photoKey}; venues without one are absent.
+ */
+export async function findApprovedPhotos(
+  db: Database,
+  refs: readonly VenueRef[],
+): Promise<Map<string, VenuePhotoRecord>> {
+  const photos = new Map<string, VenuePhotoRecord>();
+  if (refs.length === 0) {
+    return photos;
+  }
+  const rows = await db
+    .select({
+      tenantId: venuePhotos.tenantId,
+      venueId: venuePhotos.venueId,
+      url: venuePhotos.url,
+      alt: venuePhotos.alt,
+    })
+    .from(venuePhotos)
+    .where(
+      and(
+        eq(venuePhotos.status, 'approved'),
+        inArray(venuePhotos.tenantId, [...new Set(refs.map((ref) => ref.tenantId))]),
+        inArray(
+          venuePhotos.venueId,
+          refs.map((ref) => ref.venueId),
+        ),
+      ),
+    );
+  for (const row of rows) {
+    photos.set(photoKey(row.tenantId, row.venueId), { url: row.url, alt: row.alt });
+  }
+  return photos;
+}
+
+/**
+ * Builds the lookup key for a venue's photo.
+ * @param tenantId Tenant identifier.
+ * @param venueId Venue identifier.
+ * @returns A key unique to that tenant and venue.
+ */
+export function photoKey(tenantId: string, venueId: string): string {
+  return `${tenantId}:${venueId}`;
 }
 
 /**

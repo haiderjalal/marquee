@@ -63,6 +63,18 @@ export const venuePolicies = pgTable('venue_policy', {
   partialTablesAllowed: boolean('partial_tables_allowed').notNull(),
 });
 
+/** Venue photography. Only approved rows are shown publicly (see migration 0003). */
+export const venuePhotos = pgTable('venue_photo', {
+  id: uuid('id').primaryKey(),
+  tenantId: uuid('tenant_id').notNull(),
+  venueId: uuid('venue_id').notNull(),
+  url: text('url').notNull(),
+  alt: text('alt').notNull(),
+  status: text('status', { enum: ['pending', 'approved', 'withdrawn'] }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const shellVersions = pgTable(
   'shell_version',
   {

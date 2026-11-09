@@ -8,10 +8,14 @@ import {
 import {
   type CatalogueRecord,
   type DatabaseClient,
+  findApprovedPhotos,
   findPublishedVenueBySlug,
   listPublishedVenues,
+  photoKey,
   type SpaceRecord,
   type VenueAggregate,
+  type VenuePhotoRecord,
+  type VenueRecord,
 } from '@marquee/database';
 import { DomainError, pkrMinor, toMinorString } from '@marquee/domain';
 import { Inject, Injectable } from '@nestjs/common';
@@ -44,6 +48,10 @@ export class VenueService {
    */
   async listPublished(): Promise<PublicVenueSummaryDto[]> {
     const rows = await listPublishedVenues(this.database.db);
+    const photos = await findApprovedPhotos(
+      this.database.db,
+      rows.map(({ venue }) => ({ tenantId: venue.tenantId, venueId: venue.id })),
+    );
     return rows.map(({ venue, spaces }) => ({
       slug: venue.slug,
       name: venue.name,
@@ -51,7 +59,7 @@ export class VenueService {
       publishedCapacityGuests: venue.publishedCapacityGuests,
       indoor: venue.indoor,
       facilities: [...venue.facilities],
-      photo: null,
+      photo: photoFor(photos, venue),
       spaces: spaces.map((space) => ({
         id: space.id,
         name: space.name,
@@ -72,16 +80,34 @@ export class VenueService {
     if (!aggregate) {
       throw new DomainError('NOT_FOUND', 'That venue is not published.');
     }
-    return toDetail(aggregate);
+    const photos = await findApprovedPhotos(this.database.db, [
+      { tenantId: aggregate.venue.tenantId, venueId: aggregate.venue.id },
+    ]);
+    return toDetail(aggregate, photoFor(photos, aggregate.venue));
   }
+}
+
+/**
+ * Chooses the approved photo for a venue. Venues without an approved photo get null, and the
+ * web app then shows its labelled placeholder.
+ * @param photos Approved photos from the repository, keyed by tenant and venue.
+ * @param venue Venue to look up.
+ * @returns The approved photo, or null.
+ */
+function photoFor(
+  photos: ReadonlyMap<string, VenuePhotoRecord>,
+  venue: VenueRecord,
+): VenuePhotoRecord | null {
+  return photos.get(photoKey(venue.tenantId, venue.id)) ?? null;
 }
 
 /**
  * Builds the public detail DTO from an aggregate.
  * @param aggregate Published venue aggregate.
+ * @param photo Approved photo for the venue, or null.
  * @returns Venue detail with catalogue offers.
  */
-function toDetail(aggregate: VenueAggregate): PublicVenueDetailDto {
+function toDetail(aggregate: VenueAggregate, photo: VenuePhotoRecord | null): PublicVenueDetailDto {
   const { venue, spaces } = aggregate;
   const catalogue = aggregate.catalogue;
   const anyDemo = catalogue.some((item) => item.demo);
@@ -92,7 +118,7 @@ function toDetail(aggregate: VenueAggregate): PublicVenueDetailDto {
     publishedCapacityGuests: venue.publishedCapacityGuests,
     indoor: venue.indoor,
     facilities: [...venue.facilities],
-    photo: null,
+    photo,
     spaces: spaces.map((space) => toSpaceDetail(aggregate, space)),
     stages: catalogue.filter((item) => item.kind === 'stage').map(toStage),
     menuPackages: catalogue

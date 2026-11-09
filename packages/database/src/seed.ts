@@ -15,6 +15,7 @@ import {
   spaceResources,
   spaces,
   tenants,
+  venuePhotos,
   venuePolicies,
   venues,
 } from './schema';
@@ -43,7 +44,28 @@ export const DEMO_IDS = {
   spaceB: stableUuid('space:marquee-b'),
   hallA: stableUuid('resource:hall-a'),
   hallB: stableUuid('resource:hall-b'),
+  photoA: stableUuid('photo:marquee-a'),
+  photoB: stableUuid('photo:marquee-b'),
 } as const;
+
+/**
+ * Photographs uploaded to the public `marquee-photos` bucket for the demonstration venues.
+ * They are seeded as pending, so they stay hidden until a staff member approves them.
+ */
+export const DEMO_VENUE_PHOTOS = [
+  {
+    id: DEMO_IDS.photoA,
+    venueId: DEMO_IDS.venueA,
+    url: 'https://jqpfjbeguirjmwdebojp.supabase.co/storage/v1/object/public/marquee-photos/A.jpg',
+    alt: 'Marquee A hall (demonstration photograph)',
+  },
+  {
+    id: DEMO_IDS.photoB,
+    venueId: DEMO_IDS.venueB,
+    url: 'https://jqpfjbeguirjmwdebojp.supabase.co/storage/v1/object/public/marquee-photos/B.jpg',
+    alt: 'Marquee B hall (demonstration photograph)',
+  },
+] as const;
 
 /** Demo enquiry labels and their stable references. */
 const DEMO_ENQUIRIES = [
@@ -150,6 +172,17 @@ export async function seedDemoData(db: Database): Promise<void> {
       hallId: DEMO_IDS.hallB,
       hallLabel: 'Marquee B hall',
     });
+
+    await tx
+      .insert(venuePhotos)
+      .values(
+        DEMO_VENUE_PHOTOS.map((photo) => ({
+          ...photo,
+          tenantId: DEMO_TENANT_ID,
+          status: 'pending' as const,
+        })),
+      )
+      .onConflictDoNothing();
 
     await tx
       .insert(enquiries)

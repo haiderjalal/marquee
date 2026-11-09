@@ -122,6 +122,34 @@ describe('API over HTTP (real PostgreSQL)', () => {
     expect(json.data?.every((venue) => venue.spaces.length === 1)).toBe(true);
   });
 
+  it('shows a venue photo only once it is approved', async () => {
+    const photoOf = async (slug: string) => {
+      const { status, json } = await call<
+        Array<{ slug: string; photo: { url: string; alt: string } | null }>
+      >('GET', '/public/venues');
+      expect(status).toBe(200);
+      return json.data?.find((venue) => venue.slug === slug)?.photo ?? null;
+    };
+    const setStatus = async (status: string) =>
+      client.pool.query('UPDATE venue_photo SET status = $1 WHERE id = $2', [
+        status,
+        DEMO_IDS.photoA,
+      ]);
+
+    expect(await photoOf('marquee-a')).toBeNull();
+
+    await setStatus('approved');
+    try {
+      const photo = await photoOf('marquee-a');
+      expect(photo?.url).toContain('/marquee-photos/A.jpg');
+      expect(photo?.alt).not.toBe('');
+      expect(await photoOf('marquee-b')).toBeNull();
+    } finally {
+      await setStatus('pending');
+    }
+    expect(await photoOf('marquee-a')).toBeNull();
+  });
+
   it('gives 40/200 and 100/500 chairs and refuses 700 guests with the measured maximum', async () => {
     const counts = async (requestedGuests: number) =>
       call<{
